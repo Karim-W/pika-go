@@ -24,4 +24,5 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	go.uber.org/fx v1.17.0
 	go.uber.org/zap v1.21.0
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
