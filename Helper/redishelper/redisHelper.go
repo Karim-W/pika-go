@@ -2,10 +2,12 @@ package redishelper
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	models "github.com/karim-w/go-cket/Models"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
@@ -27,6 +29,21 @@ func (r *RedisManager) AddToHash(key string, field string, value string) *redis.
 }
 func (r *RedisManager) GetFromHash(key string, field string) *redis.StringCmd {
 	return r.client.HGet(r.ctx, key, field)
+}
+func (r *RedisManager) AddToSet(key string, value string) *redis.IntCmd {
+	return r.client.SAdd(r.ctx, key, value)
+}
+func (r *RedisManager) GetFromSet(key string) *redis.StringSliceCmd {
+	return r.client.SMembers(r.ctx, key)
+}
+func (r *RedisManager) LogUserOnRedis(user models.UserToken) {
+	if marshalledToken, err := json.Marshal(user); err == nil {
+		sesssionHashName := "session-" + user.SessionID
+		hearingHashName := "hearing-" + user.HearingID
+		go r.AddKeyValuePair(user.UserID, string(marshalledToken))
+		go r.AddToSet(sesssionHashName, user.UserID)
+		go r.AddToSet(hearingHashName, user.UserID)
+	}
 }
 
 func NewRedisManager(logger *zap.SugaredLogger) *RedisManager {

@@ -1,6 +1,7 @@
 package memcache
 
 import (
+	"net"
 	"time"
 
 	"github.com/patrickmn/go-cache"
@@ -13,14 +14,19 @@ type Memcache struct {
 	cache  *cache.Cache
 }
 
-func (m *Memcache) HandleIncomingSocketConnection(key string, value interface{}) {
+func (m *Memcache) HandleIncomingSocketConnection(key string, value net.Conn) {
 	m.cache.Set(key, value, cache.NoExpiration)
 }
 func (m *Memcache) HandleTerminateSocketConnection(key string) {
 	m.cache.Delete(key)
 }
-func (m *Memcache) FetchSocketConnection(key string) (interface{}, bool) {
-	return m.cache.Get(key)
+func (m *Memcache) FetchSocketConnection(key string) (net.Conn, bool) {
+	ret, ok := m.cache.Get(key)
+	if ok {
+		result := ret.(net.Conn)
+		return result, ok
+	}
+	return nil, false
 }
 
 func NewMemcache(l *zap.SugaredLogger) *Memcache {

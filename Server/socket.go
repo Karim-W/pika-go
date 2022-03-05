@@ -2,13 +2,12 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/gobwas/ws"
-	"github.com/gobwas/ws/wsutil"
 	"github.com/google/uuid"
-	connections "github.com/karim-w/go-cket/Handlers/Connections"
+	connections "github.com/karim-w/go-cket/handlers/connections"
+	"github.com/karim-w/go-cket/handlers/mayfair"
 	jwtdecoder "github.com/karim-w/go-cket/utils/JWTDecoder"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -18,42 +17,24 @@ type Test struct {
 	str string
 }
 
-func Server(logger *zap.SugaredLogger, handler *connections.ConnectionHandler) *Test {
-	fmt.Println()
-	fmt.Println()
-	fmt.Println(`:'######::::'#######::::::::::::'######::'##:::'##:'########:'########:
-'##... ##::'##.... ##::::::::::'##... ##: ##::'##:: ##.....::... ##..::
- ##:::..::: ##:::: ##:::::::::: ##:::..:: ##:'##::: ##:::::::::: ##::::
- ##::'####: ##:::: ##:'#######: ##::::::: #####:::: ######:::::: ##::::
- ##::: ##:: ##:::: ##:........: ##::::::: ##. ##::: ##...::::::: ##::::
- ##::: ##:: ##:::: ##:::::::::: ##::: ##: ##:. ##:: ##:::::::::: ##::::
-. ######:::. #######:::::::::::. ######:: ##::. ##: ########:::: ##::::
-:......:::::.......:::::::::::::......:::..::::..::........:::::..:::::`)
+func Server(logger *zap.SugaredLogger, handler *connections.ConnectionHandler, mayfair *mayfair.Mayfair) *Test {
+
 	logger.Info("Server Started ")
 	http.ListenAndServe(":8080", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		conn, _, _, err := ws.UpgradeHTTP(r, w)
-		fmt.Println(conn)
 		if err != nil {
 			// handle error
 		}
-		userToken, _ := jwtdecoder.Decode(r.Header.Get("Jwttoken"))
-		handler.HandleIncomingSocketConnection(uuid.NewString(), conn)
-		fmt.Println(userToken)
-
-		go func() {
-			defer conn.Close()
-
-			for {
-				msg, op, err := wsutil.ReadClientData(conn)
-				if err != nil {
-					// handle error
-				}
-				err = wsutil.WriteServerMessage(conn, op, msg)
-				if err != nil {
-					// handle error
-				}
-			}
-		}()
+		if userToken, err := jwtdecoder.Decode(r.Header.Get("AuthToken")); err != nil {
+			logger.Error(err)
+		} else {
+			handler.HandleIncomingSocketConnection(uuid.NewString(), conn, userToken)
+			logger.Info("New Client connection	", userToken.UserID)
+			go func() {
+				defer logger.Info("Socket connection closed	", userToken.UserID)
+				mayfair.Navigate(conn, userToken)
+			}()
+		}
 	}))
 	return &Test{str: "test"}
 }
