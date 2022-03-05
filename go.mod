@@ -20,7 +20,9 @@ require (
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/gobwas/ws v1.1.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/google/uuid v1.3.0
 	github.com/klauspost/compress v1.14.1 // indirect
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	go.uber.org/fx v1.17.0
 	go.uber.org/zap v1.21.0
