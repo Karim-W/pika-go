@@ -15,6 +15,7 @@ type Memcache struct {
 }
 
 func (m *Memcache) HandleIncomingSocketConnection(key string, value net.Conn) {
+	m.logger.Infof("Incoming connection: %s", key)
 	m.cache.Set(key, value, cache.NoExpiration)
 }
 func (m *Memcache) HandleTerminateSocketConnection(key string) {
@@ -27,6 +28,15 @@ func (m *Memcache) FetchSocketConnection(key string) (net.Conn, bool) {
 		return result, ok
 	}
 	return nil, false
+}
+func (m *Memcache) FetchSocketConnections(keys []string) []net.Conn {
+	var connections []net.Conn
+	for _, key := range keys {
+		if conn, ok := m.FetchSocketConnection(key); ok {
+			connections = append(connections, conn)
+		}
+	}
+	return connections
 }
 
 func NewMemcache(l *zap.SugaredLogger) *Memcache {

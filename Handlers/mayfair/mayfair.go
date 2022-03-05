@@ -6,6 +6,7 @@ import (
 
 	"github.com/gobwas/ws/wsutil"
 	models "github.com/karim-w/go-cket/Models"
+	"github.com/karim-w/go-cket/handlers/outgoing"
 	"github.com/karim-w/go-cket/helper/memcache"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -27,16 +28,11 @@ func (m *Mayfair) Navigate(conn net.Conn, token models.UserToken) {
 			}
 		} else {
 			adminCommand := models.SocketPayload{}
-			if err = json.Unmarshal(msg, &adminCommand); err != nil {
-				m.logger.Info("Incoming message:	", adminCommand)
-			}
-
-		}
-		err = wsutil.WriteServerMessage(conn, op, msg)
-		if err != nil {
-			if err.Error() == "EOF" {
-				keepAlive = false
-				conn.Close()
+			json.Unmarshal(msg, &adminCommand)
+			m.logger.Info("Incoming message:	", adminCommand)
+			if len(adminCommand.Audience) > 0 {
+				conList := m.cache.FetchSocketConnections(adminCommand.Audience)
+				outgoing.RelayMessages(conList, adminCommand, op)
 			}
 		}
 	}

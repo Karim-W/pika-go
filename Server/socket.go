@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gobwas/ws"
-	"github.com/google/uuid"
 	connections "github.com/karim-w/go-cket/handlers/connections"
 	"github.com/karim-w/go-cket/handlers/mayfair"
 	jwtdecoder "github.com/karim-w/go-cket/utils/JWTDecoder"
@@ -28,7 +27,7 @@ func Server(logger *zap.SugaredLogger, handler *connections.ConnectionHandler, m
 		if userToken, err := jwtdecoder.Decode(r.Header.Get("AuthToken")); err != nil {
 			logger.Error(err)
 		} else {
-			handler.HandleIncomingSocketConnection(uuid.NewString(), conn, userToken)
+			handler.HandleIncomingSocketConnection(userToken.UserID, conn, userToken)
 			logger.Info("New Client connection	", userToken.UserID)
 			go func() {
 				defer logger.Info("Socket connection closed	", userToken.UserID)
