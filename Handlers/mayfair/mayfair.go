@@ -3,18 +3,41 @@ package mayfair
 import (
 	"encoding/json"
 	"net"
+	"os"
 
 	"github.com/gobwas/ws/wsutil"
 	models "github.com/karim-w/go-cket/Models"
 	"github.com/karim-w/go-cket/handlers/outgoing"
 	"github.com/karim-w/go-cket/helper/memcache"
+	"github.com/karim-w/go-cket/utils/hermes"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
 
 type Mayfair struct {
-	logger *zap.SugaredLogger
-	cache  *memcache.Memcache
+	logger    *zap.SugaredLogger
+	cache     *memcache.Memcache
+	client    *hermes.HttpClient
+	brokerUrl string
+}
+
+func (m *Mayfair) ManageUserConnections(conn net.Conn, token models.UserToken) {
+	update := models.PresenceUpdate{
+		AddedUsers:   []string{token.UserID},
+		RemovedUsers: []string{},
+		SessionId:    token.SessionID,
+	}
+	m.notifyBroker(update)
+	keepAlive := true
+	for keepAlive {
+		_, _, err := wsutil.ReadClientData(conn)
+		if err != nil {
+			if err.Error() == "EOF" {
+				keepAlive = false
+				m.closeSocketConnection(conn, token)
+			}
+		}
+	}
 }
 
 func (m *Mayfair) Navigate(conn net.Conn, token models.UserToken) {
@@ -37,8 +60,25 @@ func (m *Mayfair) Navigate(conn net.Conn, token models.UserToken) {
 		}
 	}
 }
-func NewMayfair(logger *zap.SugaredLogger, cache *memcache.Memcache) *Mayfair {
-	return &Mayfair{logger, cache}
+
+func (m *Mayfair) closeSocketConnection(conn net.Conn, token models.UserToken) {
+	update := models.PresenceUpdate{
+		AddedUsers:   []string{},
+		RemovedUsers: []string{token.UserID},
+		SessionId:    token.SessionID,
+	}
+	m.notifyBroker(update)
+	conn.Close()
+	m.cache.HandleTerminateSocketConnection(token.UserID)
+}
+
+func (m *Mayfair) notifyBroker(update models.PresenceUpdate) {
+	m.logger.Info("Notifying broker of presence update for session: ", update.SessionId, " users to be added: ", update.AddedUsers, " users to be removed: ", update.RemovedUsers)
+}
+
+func NewMayfair(logger *zap.SugaredLogger, cache *memcache.Memcache, h *hermes.HttpClient) *Mayfair {
+	brokerUrl := os.Getenv("BROKER_URL")
+	return &Mayfair{logger, cache, h, brokerUrl}
 }
 
 var MayfairModule = fx.Provide(NewMayfair)

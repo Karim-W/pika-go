@@ -18,7 +18,7 @@ func RelayMessages(conns []net.Conn, payload models.SocketPayload, op ws.OpCode)
 			defer waitGroup.Done()
 			if text, err := json.Marshal(payload); err != nil {
 			} else {
-				err = wsutil.WriteServerMessage(conns[i], op, text)
+				err = wsutil.WriteServerMessage(conns[i], 1, text)
 				if err != nil {
 					if err.Error() == "EOF" {
 						conns[i].Close()

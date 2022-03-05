@@ -8,6 +8,7 @@ import (
 	"github.com/karim-w/go-cket/handlers/mayfair"
 	"github.com/karim-w/go-cket/helper/memcache"
 	"github.com/karim-w/go-cket/helper/redishelper"
+	"github.com/karim-w/go-cket/utils/hermes"
 	"github.com/karim-w/go-cket/utils/logs"
 	"go.uber.org/fx"
 )
@@ -24,6 +25,7 @@ func main() {
 	fmt.Println("Starting Server...")
 	app := fx.New(
 		logs.LogsModule,
+		hermes.Module,
 		redishelper.RedisModule,
 		memcache.FXMemCacheModule,
 		connections.ConnectionHandlerModule,

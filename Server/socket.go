@@ -21,8 +21,16 @@ func Server(logger *zap.SugaredLogger, handler *connections.ConnectionHandler, m
 	logger.Info("Server Started ")
 	http.ListenAndServe(":8080", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		conn, _, _, err := ws.UpgradeHTTP(r, w)
+		sender := r.Header.Get("Sender")
 		if err != nil {
 			// handle error
+		}
+		if sender == "" {
+			if userToken, err := jwtdecoder.Decode(r.Header.Get("AuthToken")); err != nil {
+				logger.Error(err)
+			} else {
+				mayfair.ManageUserConnections(conn, userToken)
+			}
 		}
 		if userToken, err := jwtdecoder.Decode(r.Header.Get("AuthToken")); err != nil {
 			logger.Error(err)
