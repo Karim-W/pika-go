@@ -7,6 +7,8 @@ import (
 
 	"github.com/gobwas/ws"
 	"github.com/gobwas/ws/wsutil"
+	"github.com/google/uuid"
+	connections "github.com/karim-w/go-cket/Handlers/Connections"
 	jwtdecoder "github.com/karim-w/go-cket/utils/JWTDecoder"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -16,7 +18,7 @@ type Test struct {
 	str string
 }
 
-func Server() *Test {
+func Server(logger *zap.SugaredLogger, handler *connections.ConnectionHandler) *Test {
 	fmt.Println()
 	fmt.Println()
 	fmt.Println(`:'######::::'#######::::::::::::'######::'##:::'##:'########:'########:
@@ -27,12 +29,15 @@ func Server() *Test {
  ##::: ##:: ##:::: ##:::::::::: ##::: ##: ##:. ##:: ##:::::::::: ##::::
 . ######:::. #######:::::::::::. ######:: ##::. ##: ########:::: ##::::
 :......:::::.......:::::::::::::......:::..::::..::........:::::..:::::`)
+	logger.Info("Server Started ")
 	http.ListenAndServe(":8080", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		conn, _, _, err := ws.UpgradeHTTP(r, w)
+		fmt.Println(conn)
 		if err != nil {
 			// handle error
 		}
 		userToken, _ := jwtdecoder.Decode(r.Header.Get("Jwttoken"))
+		handler.HandleIncomingSocketConnection(uuid.NewString(), conn)
 		fmt.Println(userToken)
 
 		go func() {
