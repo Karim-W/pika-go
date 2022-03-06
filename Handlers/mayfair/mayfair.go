@@ -30,12 +30,15 @@ func (m *Mayfair) ManageUserConnections(conn net.Conn, token models.UserToken) {
 	m.notifyBroker(update)
 	keepAlive := true
 	for keepAlive {
-		_, _, err := wsutil.ReadClientData(conn)
+		msg, _, err := wsutil.ReadClientData(conn)
 		if err != nil {
 			if err.Error() == "EOF" {
+				m.logger.Info("Closing connection for user: ", token.UserID)
 				keepAlive = false
 				m.closeSocketConnection(conn, token)
 			}
+		} else {
+			m.logger.Info("Incoming message:	", string(msg))
 		}
 	}
 }

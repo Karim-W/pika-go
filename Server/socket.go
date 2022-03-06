@@ -17,30 +17,36 @@ type Test struct {
 }
 
 func Server(logger *zap.SugaredLogger, handler *connections.ConnectionHandler, mayfair *mayfair.Mayfair) *Test {
-
 	logger.Info("Server Started ")
 	http.ListenAndServe(":8080", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		conn, _, _, err := ws.UpgradeHTTP(r, w)
 		sender := r.Header.Get("Sender")
 		if err != nil {
 			// handle error
+			logger.Error(err)
 		}
 		if sender == "" {
 			if userToken, err := jwtdecoder.Decode(r.Header.Get("AuthToken")); err != nil {
 				logger.Error(err)
 			} else {
-				mayfair.ManageUserConnections(conn, userToken)
+				handler.HandleIncomingSocketConnection(userToken.UserID, conn, userToken)
+				logger.Info("New Client connection	", userToken.UserID)
+				go func() {
+					defer logger.Info("Client connection closed for user with ID: ", userToken.UserID)
+					mayfair.ManageUserConnections(conn, userToken)
+				}()
 			}
-		}
-		if userToken, err := jwtdecoder.Decode(r.Header.Get("AuthToken")); err != nil {
-			logger.Error(err)
 		} else {
-			handler.HandleIncomingSocketConnection(userToken.UserID, conn, userToken)
-			logger.Info("New Client connection	", userToken.UserID)
-			go func() {
-				defer logger.Info("Socket connection closed	", userToken.UserID)
-				mayfair.Navigate(conn, userToken)
-			}()
+			if userToken, err := jwtdecoder.Decode(r.Header.Get("AuthToken")); err != nil {
+				logger.Error(err)
+			} else {
+				handler.HandleIncomingSocketConnection(userToken.UserID, conn, userToken)
+				logger.Info("New Client connection	", userToken.UserID)
+				go func() {
+					defer logger.Info("Socket connection closed	", userToken.UserID)
+					mayfair.Navigate(conn, userToken)
+				}()
+			}
 		}
 	}))
 	return &Test{str: "test"}
