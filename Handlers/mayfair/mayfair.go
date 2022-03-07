@@ -43,7 +43,7 @@ func (m *Mayfair) ManageUserConnections(conn net.Conn, token models.UserToken) {
 	}
 }
 
-func (m *Mayfair) Navigate(conn net.Conn, token models.UserToken) {
+func (m *Mayfair) Navigate(conn net.Conn, token models.ServerToken) {
 	keepAlive := true
 	for keepAlive {
 		msg, op, err := wsutil.ReadClientData(conn)

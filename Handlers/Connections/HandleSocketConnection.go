@@ -26,6 +26,14 @@ func (c *ConnectionHandler) HandleIncomingSocketConnection(key string, connectio
 	c.cache.HandleIncomingSocketConnection(key, connection)
 	c.redisClient.LogUserOnRedis(Token)
 }
+func (c *ConnectionHandler) HandleIncomingSeverSocketConnection(key string, connection net.Conn, Token models.ServerToken) {
+	text, err := json.Marshal(connection)
+	if err != nil {
+		c.logger.Errorf("Error marshalling connection: %v", err)
+	}
+	c.logger.Infof("Incoming Server connection: %s", text)
+	c.cache.HandleIncomingSocketConnection(key, connection)
+}
 func (c *ConnectionHandler) HandleTerminateSocketConnection(key string) {
 	c.cache.HandleTerminateSocketConnection(key)
 }

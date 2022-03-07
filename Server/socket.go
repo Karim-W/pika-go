@@ -16,7 +16,7 @@ type Test struct {
 	str string
 }
 
-func Server(logger *zap.SugaredLogger, handler *connections.ConnectionHandler, mayfair *mayfair.Mayfair) *Test {
+func Server(logger *zap.SugaredLogger, handler *connections.ConnectionHandler, mayfair *mayfair.Mayfair, decoder *jwtdecoder.DecoderService) *Test {
 	logger.Info("Server Started ")
 	http.ListenAndServe(":8080", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		conn, _, _, err := ws.UpgradeHTTP(r, w)
@@ -37,14 +37,14 @@ func Server(logger *zap.SugaredLogger, handler *connections.ConnectionHandler, m
 				}()
 			}
 		} else {
-			if userToken, err := jwtdecoder.Decode(r.Header.Get("AuthToken")); err != nil {
+			if serverToken, err := jwtdecoder.DecodeServer(r.Header.Get("AuthToken")); err != nil {
 				logger.Error(err)
 			} else {
-				handler.HandleIncomingSocketConnection(userToken.UserID, conn, userToken)
-				logger.Info("New Client connection	", userToken.UserID)
+				handler.HandleIncomingSeverSocketConnection(serverToken.ClientID, conn, serverToken)
+				logger.Info("New Client connection	", serverToken.ClientID)
 				go func() {
-					defer logger.Info("Socket connection closed	", userToken.UserID)
-					mayfair.Navigate(conn, userToken)
+					defer logger.Info("Socket connection closed	", serverToken.ClientID)
+					mayfair.Navigate(conn, serverToken)
 				}()
 			}
 		}

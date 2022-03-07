@@ -21,6 +21,7 @@ require (
 	github.com/gobwas/ws v1.1.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.3.0
+	github.com/joho/godotenv v1.4.0
 	github.com/klauspost/compress v1.14.1 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
