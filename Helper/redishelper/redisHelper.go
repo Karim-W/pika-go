@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	models "github.com/karim-w/go-cket/Models"
+	models "github.com/karim-w/pikachu/Models"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
@@ -52,6 +52,8 @@ func NewRedisManager(logger *zap.SugaredLogger) *RedisManager {
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
+	ctx := context.Background()
+	rdb.Set(ctx, "foo", "bar", time.Hour*24)
 	return &RedisManager{logger, rdb, context.Background()}
 }
 

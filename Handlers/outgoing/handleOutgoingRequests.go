@@ -7,7 +7,7 @@ import (
 
 	"github.com/gobwas/ws"
 	"github.com/gobwas/ws/wsutil"
-	models "github.com/karim-w/go-cket/Models"
+	models "github.com/karim-w/pikachu/Models"
 )
 
 func RelayMessages(conns []net.Conn, payload models.SocketPayload, op ws.OpCode) {

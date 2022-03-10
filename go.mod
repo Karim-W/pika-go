@@ -1,4 +1,4 @@
-module github.com/karim-w/go-cket
+module github.com/karim-w/pikachu
 
 go 1.17
 
