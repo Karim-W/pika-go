@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt"
-	models "github.com/karim-w/pikachu/Models"
-	"github.com/karim-w/pikachu/utils/hermes"
+	models "github.com/karim-w/pika-go/Models"
+	"github.com/karim-w/pika-go/utils/hermes"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )

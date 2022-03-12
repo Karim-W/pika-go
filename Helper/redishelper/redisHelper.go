@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	models "github.com/karim-w/pikachu/Models"
+	models "github.com/karim-w/pika-go/Models"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )

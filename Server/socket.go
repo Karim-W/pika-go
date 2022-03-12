@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/gobwas/ws"
-	connections "github.com/karim-w/pikachu/handlers/connections"
-	"github.com/karim-w/pikachu/handlers/mayfair"
-	jwtdecoder "github.com/karim-w/pikachu/utils/JWTDecoder"
+	connections "github.com/karim-w/pika-go/handlers/connections"
+	"github.com/karim-w/pika-go/handlers/mayfair"
+	jwtdecoder "github.com/karim-w/pika-go/utils/JWTDecoder"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )

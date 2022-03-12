@@ -4,14 +4,14 @@ import (
 	"fmt"
 
 	"github.com/joho/godotenv"
-	server "github.com/karim-w/pikachu/Server"
-	connections "github.com/karim-w/pikachu/handlers/connections"
-	"github.com/karim-w/pikachu/handlers/mayfair"
-	"github.com/karim-w/pikachu/helper/memcache"
-	"github.com/karim-w/pikachu/helper/redishelper"
-	jwtdecoder "github.com/karim-w/pikachu/utils/JWTDecoder"
-	"github.com/karim-w/pikachu/utils/hermes"
-	"github.com/karim-w/pikachu/utils/logs"
+	server "github.com/karim-w/pika-go/Server"
+	connections "github.com/karim-w/pika-go/handlers/connections"
+	"github.com/karim-w/pika-go/handlers/mayfair"
+	"github.com/karim-w/pika-go/helper/memcache"
+	"github.com/karim-w/pika-go/helper/redishelper"
+	jwtdecoder "github.com/karim-w/pika-go/utils/JWTDecoder"
+	"github.com/karim-w/pika-go/utils/hermes"
+	"github.com/karim-w/pika-go/utils/logs"
 	"go.uber.org/fx"
 )
 

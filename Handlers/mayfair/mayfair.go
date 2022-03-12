@@ -6,10 +6,10 @@ import (
 	"os"
 
 	"github.com/gobwas/ws/wsutil"
-	models "github.com/karim-w/pikachu/Models"
-	"github.com/karim-w/pikachu/handlers/outgoing"
-	"github.com/karim-w/pikachu/helper/memcache"
-	"github.com/karim-w/pikachu/utils/hermes"
+	models "github.com/karim-w/pika-go/Models"
+	"github.com/karim-w/pika-go/handlers/outgoing"
+	"github.com/karim-w/pika-go/helper/memcache"
+	"github.com/karim-w/pika-go/utils/hermes"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )

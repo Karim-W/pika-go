@@ -1,4 +1,4 @@
-module github.com/karim-w/pikachu
+module github.com/karim-w/pika-go
 
 go 1.17
 

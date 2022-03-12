@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net"
 
-	models "github.com/karim-w/pikachu/Models"
-	"github.com/karim-w/pikachu/helper/memcache"
-	"github.com/karim-w/pikachu/helper/redishelper"
+	models "github.com/karim-w/pika-go/Models"
+	"github.com/karim-w/pika-go/helper/memcache"
+	"github.com/karim-w/pika-go/helper/redishelper"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
