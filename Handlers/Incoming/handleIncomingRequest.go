@@ -1,5 +1,0 @@
-package incoming
-
-func HandleIncomingRequest() {
-
-}
